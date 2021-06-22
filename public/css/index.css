@@ -1,0 +1,23 @@
+table {
+  border-collapse: separate;
+  border-spacing: 25px 0;
+}
+
+td {
+  padding: 10px 0;
+}
+
+.statusContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.statusArea {
+  width: 50em;
+  margin: 15px;
+  text-align: center;
+}
+
+#statusMessage {
+  background-color: #eeee0050;
+}

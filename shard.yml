@@ -1,0 +1,54 @@
+name: pedestrian-search
+version: 0.1.0
+
+authors:
+  - badBlackShark <Timdaniel.Engelhardt@web.de>
+
+crystal: 1.0.0
+
+license: UNLICENSED
+
+targets:
+  pedestrian-search:
+    main: src/pedestrian-search.cr
+
+  amber:
+    main: lib/amber/src/amber/cli.cr
+
+dependencies:
+  amber:
+    github: amberframework/amber
+    #version: 0.36.0
+    branch: master
+
+  granite:
+    github: amberframework/granite
+    version: ~> 0.22.1
+
+  quartz_mailer:
+    github: amberframework/quartz-mailer
+    version: ~> 0.7.0
+
+  jasper_helpers:
+    github: amberframework/jasper-helpers
+    version: ~> 0.2.5
+
+  pg:
+    github: will/crystal-pg
+    version: ~> 0.23.0
+
+  citrine-i18n:
+    github: amberframework/citrine-i18n
+    version: ~> 0.4.0
+
+  lexbor:
+    github: kostya/lexbor
+    branch: master
+
+development_dependencies:
+  garnet_spec:
+    github: amberframework/garnet-spec
+    version: 0.2.0
+  ameba:
+    github: crystal-ameba/ameba
+    version: ~> 0.13.4
