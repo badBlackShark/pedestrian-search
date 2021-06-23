@@ -29,7 +29,7 @@ Amber::Server.configure do
 
   routes :web do
     get "/", HomeController, :index
-    post "/", HomeController, :extract
+    post "/", HomeController, :clear
 
     websocket "/frontend", FrontendSocket
   end

@@ -3,8 +3,8 @@ class HomeController < ApplicationController
     render("index.slang")
   end
 
-  def extract
-    links = params.[:linksarea].split("\r\n")
-    links.each { |link| p link }
+  def clear
+    WebsiteCache.clear!
+    render("index.slang")
   end
 end

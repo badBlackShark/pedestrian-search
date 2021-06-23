@@ -11,15 +11,19 @@
       / a.list-group-item.list-group-item-action target="_blank" href="https://github.com/veelenga/awesome-crystal" List of Awesome Crystal projects and shards
       / a.list-group-item.list-group-item-action target="_blank" href="https://crystalshards.xyz" What's hot in Crystal right now
 
-  == form(action: "/", onsubmit: "extract();return false", method: :post) do
+
+  == form(action: "/", method: :post) do
     == csrf_tag
     .form-group
       == text_area(id: "linksarea", name: "linksarea", content: nil, required: true, placeholder: "Put your links to extract dates for here", rows: 20, cols: 100)
-    == submit("Extract Dates", class: "btn btn-success btn-sm")
+    == submit("Extract Dates", class: "btn btn-success btn-sm", onclick: "extract();return false")
+    == submit("Clear Cache", class: "btn btn-danger btn-sm")
+
+
 
 <div class="statusContainer">
   <div class="statusArea">
-    <p id="statusMessage">Press the button to begin.</p>
+    <p id="statusMessage">Press the "Extract Dates" button to begin.</p>
   </div>
 </div>
 
