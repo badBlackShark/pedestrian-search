@@ -4,5 +4,6 @@ enum ErrorCode
   StrategyFailure       = 5001
   RedirectDepthExceeded = 5002
   MaxRetriesExceeded    = 5003
-  InvalidBody           = 5004
+  UnhandledHTTPStatus   = 5004
+  InvalidBody           = 5005
 end
