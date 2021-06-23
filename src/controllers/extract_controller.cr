@@ -22,21 +22,20 @@ class ExtractController < ApplicationController
         valid_jobs += 1
         spawn { job_channel.send({job, extractor.extract(job)}) }
       when Error
-        results << ErrorResult.new(url_string, job.code, job.message, (Time.utc - job.created_at).total_milliseconds)
+        results << ErrorResult.new(url_string, job.code, job.message, 0_f64, 0_f64)
       end
     end
 
-    puts "Valid jobs: #{valid_jobs}"
+    Log.debug { "Valid jobs: #{valid_jobs}" }
 
     valid_jobs.times do |i|
-      puts "sending ##{i}"
       job, result = job_channel.receive
       FrontendSocket.broadcast("message", "frontend_stream:1", "message_new", {"message" => %({"type": "result", "result": #{result.to_json}})})
     end
 
     finish = Time.monotonic - start
 
-    FrontendSocket.broadcast("message", "frontend_stream:1", "message_new", {"message" => %({"type": "time", "message": "Total server time: #{finish.total_milliseconds} ms"})})
+    FrontendSocket.broadcast("message", "frontend_stream:1", "message_new", {"message" => %({"type": "time", "message": "Total server time: #{finish.total_milliseconds}ms"})})
 
     response.status = HTTP::Status::OK
   end

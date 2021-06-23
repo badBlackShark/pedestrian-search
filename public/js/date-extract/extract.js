@@ -34,14 +34,14 @@ async function extract() {
 }
 
 function render_table() {
-  let table = document.getElementById('results_table');
+  let table = document.getElementById('resultsTable');
 
   if (table) {
     table.remove();
   }
 
   table = document.createElement('table');
-  table.setAttribute('id', 'results_table');
+  table.setAttribute('id', 'resultsTable');
   table.setAttribute('width', '100%');
 
   let thead = table.createTHead();
@@ -56,7 +56,15 @@ function render_table() {
   th.appendChild(text);
   row.appendChild(th);
   th = document.createElement('th');
-  text = document.createTextNode('Computation Time');
+  text = document.createTextNode('Request Time');
+  th.appendChild(text);
+  row.appendChild(th);
+  th = document.createElement('th');
+  text = document.createTextNode('Compute Time');
+  th.appendChild(text);
+  row.appendChild(th);
+  th = document.createElement('th');
+  text = document.createTextNode('Cache Hit');
   th.appendChild(text);
   row.appendChild(th);
 
@@ -65,7 +73,7 @@ function render_table() {
 }
 
 function render_result(result) {
-  let table = document.getElementById('results_table');
+  let table = document.getElementById('resultsTable');
   let row = document.createElement('tr');
   table.appendChild(row);
 
@@ -85,12 +93,26 @@ function render_result(result) {
     date_slot.appendChild(date_node);
     row.appendChild(date_slot);
 
-    let time_node = document.createElement('span');
-    time_node.setAttribute('class', 'resultMs');
-    time_node.innerText = result.time_needed + 'ms';
-    let time_slot = document.createElement('td');
-    time_slot.appendChild(time_node);
-    row.appendChild(time_slot);
+    let request_time_node = document.createElement('span');
+    request_time_node.setAttribute('class', 'resultRequestTime');
+    request_time_node.innerText = result.request_time_needed + 'ms';
+    let request_time_slot = document.createElement('td');
+    request_time_slot.appendChild(request_time_node);
+    row.appendChild(request_time_slot);
+
+    let compute_time_node = document.createElement('span');
+    compute_time_node.setAttribute('class', 'resultComputeTime');
+    compute_time_node.innerText = result.compute_time_needed + 'ms';
+    let compute_time_slot = document.createElement('td');
+    compute_time_slot.appendChild(compute_time_node);
+    row.appendChild(compute_time_slot);
+
+    let cache_node = document.createElement('span');
+    cache_node.setAttribute('class', 'cacheHit');
+    cache_node.innerText = result.cache_hit == 'true' ? 'Yes' : 'No';
+    let cache_slot = document.createElement('td');
+    cache_slot.appendChild(cache_node);
+    row.appendChild(cache_slot);
   } else {
     let message_node = document.createElement('span');
     message_node.setAttribute('class', 'resultError');
@@ -99,11 +121,25 @@ function render_result(result) {
     message_slot.appendChild(message_node);
     row.appendChild(message_slot);
 
-    let time_node = document.createElement('span');
-    time_node.setAttribute('class', 'resultMs');
-    time_node.innerText = result.time_needed + 'ms';
-    let time_slot = document.createElement('td');
-    time_slot.appendChild(time_node);
-    row.appendChild(time_slot);
+    let request_time_node = document.createElement('span');
+    request_time_node.setAttribute('class', 'resultRequestTime');
+    request_time_node.innerText = result.request_time_needed + 'ms';
+    let request_time_slot = document.createElement('td');
+    request_time_slot.appendChild(request_time_node);
+    row.appendChild(request_time_slot);
+
+    let compute_time_node = document.createElement('span');
+    compute_time_node.setAttribute('class', 'resultComputeTime');
+    compute_time_node.innerText = result.compute_time_needed + 'ms';
+    let compute_time_slot = document.createElement('td');
+    compute_time_slot.appendChild(compute_time_node);
+    row.appendChild(compute_time_slot);
+
+    let cache_node = document.createElement('span');
+    cache_node.setAttribute('class', 'cacheHit');
+    cache_node.innerText = 'No';
+    let cache_slot = document.createElement('td');
+    cache_slot.appendChild(cache_node);
+    row.appendChild(cache_slot);
   }
 }

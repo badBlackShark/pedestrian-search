@@ -4,9 +4,10 @@ class ErrorResult
   getter uri
   getter code
   getter message
-  getter time_needed
+  getter request_time_needed
+  getter compute_time_needed
 
-  def initialize(@uri : String, @code : ErrorCode, @message : String, @time_needed : Float64)
+  def initialize(@uri : String, @code : ErrorCode, @message : String, @request_time_needed : Float64, @compute_time_needed : Float64)
   end
 
   def to_json(builder : JSON::Builder)
@@ -14,7 +15,8 @@ class ErrorResult
       builder.field("uri", @uri)
       builder.field("code", @code.to_i)
       builder.field("message", @message)
-      builder.field("time_needed", @time_needed.to_s)
+      builder.field("request_time_needed", @request_time_needed.to_s)
+      builder.field("compute_time_needed", @compute_time_needed.to_s)
     end
   end
 end

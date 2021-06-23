@@ -12,17 +12,34 @@ class DateExtractor
     Log.context.set(url: job.uri.to_s)
     Log.info { "Starting job" }
 
+    raw_date = WebsiteCache.retrieve("#{job.uri.to_s}-date")
+
+    if(raw_date && (date = parse_date(raw_date)))
+      begin
+        return Result.new(job, date, 0_f64, (Time.utc - job.created_at).total_milliseconds, true)
+      rescue e : Exception
+      end
+    end
+
+    html = ""
     result = nil
+
     uri = job.uri
     redirects = 0
     retries = 0
     success = false
     backoff_time = job.config.backoff_time
 
+    max_redirects = job.config.max_redirects
+    max_retries = job.config.max_retries
+
     headers = HTTP::Headers.new
     headers["User-Agent"] = job.config.user_agent
 
-    while(!success && redirects < job.config.max_redirects && retries < job.config.max_retries)
+    request_time = nil
+    compute_start = nil
+
+    while(!success && redirects <= max_redirects && retries <= max_retries)
       HTTP::Client.new(uri) do |client|
         begin
           Log.context.set(url: uri.to_s, redirect: redirects, retry: retries)
@@ -33,10 +50,13 @@ class DateExtractor
             when .success?
               success = true
               html = response.body_io.gets_to_end
-              if(date = extract_date(Lexbor::Parser.new(html)))
-                result = Result.new(job, date, (Time.utc - job.created_at).total_milliseconds)
+              request_time = (Time.utc - job.created_at).total_milliseconds
+              compute_start = Time.utc
+              if(date = extract_date(html))
+                result = Result.new(job, date, request_time, (Time.utc - compute_start).total_milliseconds)
               else
                 Log.error { "Couldn't extract date." }
+                result = ErrorResult.new(uri.to_s, ErrorCode::StrategyFailure, "Extraction strategy failed.", request_time, (Time.utc - compute_start).total_milliseconds)
               end
               break
             when .redirection?
@@ -44,12 +64,19 @@ class DateExtractor
               uri = URI.parse(location)
               client.close
               redirects += 1
+              if redirects > max_redirects
+                result = ErrorResult.new(uri.to_s, ErrorCode::RedirectDepthExceeded, "Maximum redirect depth exceeded.", (Time.utc - job.created_at).total_milliseconds, 0_f64)
+              end
             when .server_error?
               retries += 1
+              if retries > max_retries
+                result = ErrorResult.new(uri.to_s, ErrorCode::MaxRetriesExceeded, "Maximum amount of retries exceeded.", (Time.utc - job.created_at).total_milliseconds, 0_f64)
+              end
               sleep(backoff_time)
               backoff_time *= 2
             else
               Log.error { "Unhandled HTTP status: #{response.status}" }
+              return ErrorResult.new(uri.to_s, ErrorCode::UnhandledHTTPStatus, "HTTP status #{response.status} wasn't handled.", (Time.utc - job.created_at).total_milliseconds, 0_f64)
             end
           end
         ensure
@@ -58,15 +85,25 @@ class DateExtractor
       end
     end
 
-    return result || ErrorResult.new(uri.to_s, ErrorCode::StrategyFailure, "Extraction strategy failed.", (Time.utc - job.created_at).total_milliseconds)
+    if result.is_a?(Result)
+      WebsiteCache.store("#{job.uri.to_s}-date", result.date)
+      WebsiteCache.store("#{job.uri.to_s}-content", html)
+    end
+
+    return result.not_nil!
 
   rescue exception
     Log.error { "Internal error during date extraction" }
     Log.debug { exception.inspect_with_backtrace }
-    ErrorResult.new(uri.to_s, ErrorCode::InternalFailure, exception.inspect, (Time.utc - job.created_at).total_milliseconds)
+
+    request_time ||= (Time.utc - job.created_at).total_milliseconds
+    compute_time = compute_start ? (Time.utc - job.created_at).total_milliseconds : 0_f64
+    return ErrorResult.new(uri.to_s, ErrorCode::InternalFailure, exception.inspect, request_time, compute_time)
   end
 
-  private def extract_date(parser : Lexbor::Parser) : Time?
+  private def extract_date(html : String) : Time?
+     parser = Lexbor::Parser.new(html)
+
     # If the combo strategy is used this will be determined for the different angles individually.
     find_modified = case @strategy
       when ExtractionStrategy::LexborPublished
@@ -96,7 +133,7 @@ class DateExtractor
           date_str = json["dateModified"]?.try(&.as_s)
 
           # Sometimes the attribute we're looking for is on the top level, sometimes it is
-          # nested somewhere within the structure. If it's not top level we simply scan the raw String.
+          # nested somewhere within the structure. If it's not top level we simply scan the raw_date String.
           unless date_str
             raw = node.inner_text
             i = raw.index(%("dateModified"))
@@ -111,7 +148,6 @@ class DateExtractor
             date_str = raw[i+17..i+41] if i
           end
         end
-
 
         if(date_str && (date = parse_date(date_str)))
           return date
@@ -167,6 +203,8 @@ class DateExtractor
 
     return meta_date if meta_date
 
+    # If both prior strategies failed we'll look for any <time> node that looks like something we
+    # can use.
     parser.nodes(:time).each do |node|
       if(candidate = node.attribute_by("class"))
         candidate = candidate.downcase
@@ -179,7 +217,11 @@ class DateExtractor
       end
     end
 
-    return nil
+    # If that also failed simply search for the first thing that looks like a date in the entire html.
+    date_str = html.scan(/\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2})?/)[0]?.try(&.[0]?)
+    if(date_str && (date = parse_date(date_str)))
+      return date
+    end
   end
 
   DATE_FORMATS = {
