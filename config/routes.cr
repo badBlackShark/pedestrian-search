@@ -36,6 +36,7 @@ Amber::Server.configure do
 
   routes :api do
     post "/extract", ExtractController, :extract
+    post "/search", SearchController, :search
   end
 
   routes :static do

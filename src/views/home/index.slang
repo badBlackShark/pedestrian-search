@@ -20,14 +20,22 @@
     == submit("Clear Cache", class: "btn btn-danger btn-sm")
 
 
+  == text_field(id: "searchfield", name: "searchField", content: nil, required: true, placeholder: "Search for anything")
+  == submit("Search", class: "btn btn-success btn-sm", onclick: "search();return false")
+
+
 
 <div class="statusContainer">
   <div class="statusArea">
-    <p id="statusMessage">Press the "Extract Dates" button to begin.</p>
+    <p id="statusMessage">Hit the "Extract Dates" button to find article dates, or start a search.</p>
   </div>
 </div>
 
 <div id="results"></div>
 
 <script src="/js/amber.min.js"></script>
+<script src="/js/dayjs.min.js"></script>
+
+<script src="/js/remove_results.js"></script>
 <script src="/js/date-extract/extract.js"></script>
+<script src="/js/search.js"></script>
