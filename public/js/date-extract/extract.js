@@ -5,7 +5,6 @@ socket.connect().then(() => {
 
   channel.on('message_new', (message) => {
     const json = JSON.parse(message['message']);
-    console.log(json);
     if (json['type'] == 'result') {
       render_result(json['result']);
     } else {
@@ -21,7 +20,7 @@ async function extract() {
   urls = [...new Set(urls)];
 
   var status = document.getElementById('statusMessage');
-  status.innerText = 'Working on it...';
+  status.innerText = 'Extracting dates...';
   status.setAttribute('style', 'background-color: #eeee0050;');
 
   render_table();
@@ -34,11 +33,7 @@ async function extract() {
 }
 
 function render_table() {
-  let table = document.getElementById('resultsTable');
-
-  if (table) {
-    table.remove();
-  }
+  remove_results();
 
   table = document.createElement('table');
   table.setAttribute('id', 'resultsTable');
@@ -64,7 +59,7 @@ function render_table() {
   th.appendChild(text);
   row.appendChild(th);
   th = document.createElement('th');
-  text = document.createTextNode('Cache Hit');
+  text = document.createTextNode('Strategy Used');
   th.appendChild(text);
   row.appendChild(th);
 
@@ -88,7 +83,7 @@ function render_result(result) {
   if (!result.code) {
     let date_node = document.createElement('span');
     date_node.setAttribute('class', 'resultDate');
-    date_node.innerText = result.date;
+    date_node.innerText = dayjs(result.date).format('MMM DD, YYYY');
     let date_slot = document.createElement('td');
     date_slot.appendChild(date_node);
     row.appendChild(date_slot);
@@ -107,12 +102,12 @@ function render_result(result) {
     compute_time_slot.appendChild(compute_time_node);
     row.appendChild(compute_time_slot);
 
-    let cache_node = document.createElement('span');
-    cache_node.setAttribute('class', 'cacheHit');
-    cache_node.innerText = result.cache_hit == 'true' ? 'Yes' : 'No';
-    let cache_slot = document.createElement('td');
-    cache_slot.appendChild(cache_node);
-    row.appendChild(cache_slot);
+    let strategy_node = document.createElement('span');
+    strategy_node.setAttribute('class', 'strategy');
+    strategy_node.innerText = result.date_source_text;
+    let strategy_slot = document.createElement('td');
+    strategy_slot.appendChild(strategy_node);
+    row.appendChild(strategy_slot);
   } else {
     let message_node = document.createElement('span');
     message_node.setAttribute('class', 'resultError');
@@ -135,11 +130,11 @@ function render_result(result) {
     compute_time_slot.appendChild(compute_time_node);
     row.appendChild(compute_time_slot);
 
-    let cache_node = document.createElement('span');
-    cache_node.setAttribute('class', 'cacheHit');
-    cache_node.innerText = 'No';
-    let cache_slot = document.createElement('td');
-    cache_slot.appendChild(cache_node);
-    row.appendChild(cache_slot);
+    let strategy_node = document.createElement('span');
+    strategy_node.setAttribute('class', 'strategy');
+    strategy_node.innerText = result.date_source_text;
+    let strategy_slot = document.createElement('td');
+    strategy_slot.appendChild(strategy_node);
+    row.appendChild(strategy_slot);
   }
 }
