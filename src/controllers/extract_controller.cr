@@ -35,7 +35,7 @@ class ExtractController < ApplicationController
 
     finish = Time.monotonic - start
 
-    FrontendSocket.broadcast("message", "frontend_stream:1", "message_new", {"message" => %({"type": "time", "message": "Total server time: #{finish.total_milliseconds}ms"})})
+    FrontendSocket.broadcast("message", "frontend_stream:1", "message_new", {"message" => %({"type": "time", "message": "Total server time needed: #{finish.total_milliseconds}ms"})})
 
     response.status = HTTP::Status::OK
   end
