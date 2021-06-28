@@ -2,7 +2,7 @@ require "lexbor"
 
 # Parts of the content extraction are inspired by https://github.com/mozilla/readability
 class Searcher
-  IGNORE_HINTS = {"nav", "link", "noprint", "title", "path", "menu", "editorial"}
+  IGNORE_HINTS = {"nav", "link", "noprint", "title", "path", "menu", "editorial", "caption"}
   # As per https://meta.wikimedia.org/wiki/Stop_word_list/google_stop_word_list
   STOPWORDS = {"a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any",
                "are", "aren't", "as", "at", "be", "because", "been", "before", "being", "below", "between",
