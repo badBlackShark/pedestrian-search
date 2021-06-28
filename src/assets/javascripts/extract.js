@@ -1,41 +1,57 @@
-let socket = new Amber.Socket('/frontend');
-socket.connect().then(() => {
-  let channel = socket.channel('frontend_stream:1');
-  channel.join();
+import Amber from 'amber';
+import * as dayjs from 'dayjs';
+import {v4 as uuidv4} from 'uuid';
 
-  channel.on('message_new', (message) => {
-    const json = JSON.parse(message['message']);
-    if (json['type'] == 'result') {
-      render_result(json['result']);
-    } else {
-      var status = document.getElementById('statusMessage');
-      status.setAttribute('style', 'background-color: #00ff0050;');
-      status.innerText = json['message'];
-    }
-  });
-});
+const socket = new Amber.Socket('/frontend');
+socket.connect();
 
-async function extract() {
-  var urls = document.getElementById('linksarea').value.split('\n');
+window.extract = function () {
+  remove_results();
+
+  let urls = document.getElementById('linksarea').value.split('\n');
   urls = [...new Set(urls)];
 
-  var status = document.getElementById('statusMessage');
+  let status = document.getElementById('statusMessage');
+
+  if (urls.filter((url) => url.length > 0).length == 0) {
+    status.innerText = 'No URLs to crawl were provided.';
+    status.style.backgroundColor = '#ff000050';
+    return;
+  }
+
   status.innerText = 'Extracting dates...';
   status.setAttribute('style', 'background-color: #eeee0050;');
 
   render_table();
 
+  const request_id = uuidv4();
+  console.log(request_id);
+
+  let channel = socket.channel('frontend_stream:' + request_id);
+  channel.join();
+
   fetch('/extract', {
     method: 'POST',
-    headers: {'Content-Type': 'application/json'},
+    headers: {'Content-Type': 'application/json', 'X-Request-ID': request_id},
     body: JSON.stringify({urls: urls}),
   });
-}
+
+  channel.on('message_new', (message) => {
+    console.log(message);
+    const json = JSON.parse(message['message']);
+    if (json['type'] == 'result') {
+      render_result(json['result']);
+    } else {
+      let status = document.getElementById('statusMessage');
+      status.setAttribute('style', 'background-color: #00ff0050;');
+      status.innerText = json['message'];
+      channel.leave();
+    }
+  });
+};
 
 function render_table() {
-  remove_results();
-
-  table = document.createElement('table');
+  let table = document.createElement('table');
   table.setAttribute('id', 'resultsTable');
   table.setAttribute('width', '100%');
 
