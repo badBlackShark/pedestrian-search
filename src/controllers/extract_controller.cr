@@ -6,9 +6,11 @@ class ExtractController < ApplicationController
       data = Error.new(ErrorCode::InvalidBody, "Content-Type must be application/json", Time.utc)
       return data
     end
+
     start = Time.monotonic
 
-    urls = Urls.from_json(request.body.not_nil!).urls.reject { |url| url.empty? }
+    urls_str = request.body.not_nil!.gets_to_end
+    urls = Urls.from_json(urls_str).urls.reject { |url| url.empty? }
 
     results = Array(Result | ErrorResult).new(urls.size)
     job_channel = Channel({Job, Result | ErrorResult}).new
@@ -28,14 +30,15 @@ class ExtractController < ApplicationController
 
     Log.debug { "Valid jobs: #{valid_jobs}" }
 
+    id = request.headers["X-Request-ID"]
     valid_jobs.times do |i|
       job, result = job_channel.receive
-      FrontendSocket.broadcast("message", "frontend_stream:1", "message_new", {"message" => %({"type": "result", "result": #{result.to_json}})})
+      FrontendSocket.broadcast("message", "frontend_stream:#{id}", "message_new", {"message" => %({"type": "result", "result": #{result.to_json}})})
     end
 
     finish = Time.monotonic - start
 
-    FrontendSocket.broadcast("message", "frontend_stream:1", "message_new", {"message" => %({"type": "time", "message": "Total server time needed: #{finish.total_milliseconds}ms"})})
+    FrontendSocket.broadcast("message", "frontend_stream:#{id}", "message_new", {"message" => %({"type": "time", "message": "Total server time needed: #{finish.total_milliseconds}ms"})})
 
     response.status = HTTP::Status::OK
   end
