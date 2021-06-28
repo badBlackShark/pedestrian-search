@@ -1,5 +1,5 @@
 table {
-  border-collapse: separate;
+  border-collapse: separate !important;
   border-spacing: 25px 0;
 }
 
