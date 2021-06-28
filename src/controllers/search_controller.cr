@@ -39,8 +39,6 @@ class SearchController < ApplicationController
 
     results = searcher.rank_results(results)
 
-    # puts results.map { |r| "#{r.uri.to_s}: #{r.score}\n#{r.title}\n#{r.snippet}\n\n" }.join("\n")
-
     finish = Time.monotonic - start
 
     response.status = HTTP::Status::OK
