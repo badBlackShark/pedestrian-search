@@ -1,4 +1,4 @@
-async function remove_results() {
+window.remove_results = function () {
   let table = document.getElementById('resultsTable');
 
   if (table) {
@@ -10,4 +10,4 @@ async function remove_results() {
   if (searchResults) {
     searchResults.remove();
   }
-}
+};

@@ -1,14 +1,27 @@
-async function search() {
-  var urls = document.getElementById('linksarea').value.split('\n');
+import * as dayjs from 'dayjs';
+
+window.search = function () {
+  remove_results();
+
+  let urls = document.getElementById('linksarea').value.split('\n');
   urls = [...new Set(urls)];
 
-  var search_term = document.getElementById('searchfield').value;
+  let status = document.getElementById('statusMessage');
 
-  var status = document.getElementById('statusMessage');
+  let search_term = document.getElementById('searchfield').value;
+
+  if (urls.filter((url) => url.length > 0).length == 0) {
+    status.innerText = 'No URLs to crawl were provided.';
+    status.style.backgroundColor = '#ff000050';
+    return;
+  } else if (search_term.length == 0) {
+    status.innerText = 'Please enter a search term to search.';
+    status.style.backgroundColor = '#ff000050';
+    return;
+  }
+
   status.innerText = 'Searching...';
   status.style.backgroundColor = '#eeee0050';
-
-  remove_results();
 
   fetch('/search', {
     method: 'POST',
@@ -18,7 +31,7 @@ async function search() {
     .then((response) => response.json())
     .then((data) => {
       console.log(data);
-      var parsed_results = data.results;
+      let parsed_results = data.results;
 
       if (parsed_results.length > 0) {
         let search_results = document.createElement('div');
@@ -27,7 +40,7 @@ async function search() {
         parent.appendChild(search_results);
 
         parsed_results.forEach((result) => {
-          var result_div = render_search_result(result);
+          let result_div = render_search_result(result);
           search_results.appendChild(result_div);
         });
         status.innerText = 'Results found in ' + data.server_time + 'ms';
@@ -37,7 +50,7 @@ async function search() {
         status.style.backgroundColor = '#ff000050';
       }
     });
-}
+};
 
 function render_search_result(result) {
   let result_div = document.createElement('div');
