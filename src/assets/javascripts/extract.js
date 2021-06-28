@@ -25,7 +25,6 @@ window.extract = function () {
   render_table();
 
   const request_id = uuidv4();
-  console.log(request_id);
 
   let channel = socket.channel('frontend_stream:' + request_id);
   channel.join();
@@ -37,7 +36,6 @@ window.extract = function () {
   });
 
   channel.on('message_new', (message) => {
-    console.log(message);
     const json = JSON.parse(message['message']);
     if (json['type'] == 'result') {
       render_result(json['result']);

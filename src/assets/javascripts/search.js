@@ -30,7 +30,6 @@ window.search = function () {
   })
     .then((response) => response.json())
     .then((data) => {
-      console.log(data);
       let parsed_results = data.results;
 
       if (parsed_results.length > 0) {
