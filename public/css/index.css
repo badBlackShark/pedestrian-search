@@ -22,9 +22,8 @@ td {
   background-color: #eeee0050;
 }
 
-#searchfield {
-  margin-right: 5px;
-  width: 20%;
+.searchfield {
+  margin-right: 10px;
 }
 
 .searchResult > * {

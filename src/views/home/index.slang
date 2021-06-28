@@ -11,7 +11,6 @@
       / a.list-group-item.list-group-item-action target="_blank" href="https://github.com/veelenga/awesome-crystal" List of Awesome Crystal projects and shards
       / a.list-group-item.list-group-item-action target="_blank" href="https://crystalshards.xyz" What's hot in Crystal right now
 
-
   == form(action: "/", method: :post) do
     == csrf_tag
     .form-group
@@ -19,11 +18,9 @@
     == submit("Extract Dates", class: "btn btn-success btn-sm", onclick: "extract();return false")
     == submit("Clear Cache", class: "btn btn-danger btn-sm")
 
-
-  == text_field(id: "searchfield", name: "searchField", content: nil, required: true, placeholder: "Search for anything")
+.row.justify-content-center
+  == text_field(id: "searchfield", class: "searchField", name: "searchField", content: nil, required: true, placeholder: "Search for anything")
   == submit("Search", class: "btn btn-success btn-sm", onclick: "search();return false")
-
-
 
 <div class="statusContainer">
   <div class="statusArea">
