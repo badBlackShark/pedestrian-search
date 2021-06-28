@@ -1,7 +1,3 @@
-<head>
-  <link rel="stylesheet" href="/css/index.css">
-</head>
-
 .row.justify-content-center
   .col-sm-12.col-md-6
     h2 = t "welcome_to_pedestrian"
@@ -29,10 +25,3 @@
 </div>
 
 <div id="results"></div>
-
-<script src="/js/amber.min.js"></script>
-<script src="/js/dayjs.min.js"></script>
-
-<script src="/js/remove_results.js"></script>
-<script src="/js/date-extract/extract.js"></script>
-<script src="/js/search.js"></script>
