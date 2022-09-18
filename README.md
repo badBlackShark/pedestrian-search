@@ -4,8 +4,8 @@
 
 Pedestrian Search is, essentially, a very pedestrian variation of a search engine using a user- but pre-defined set of links. Its two functions are a date extraction algorithm to find out when an article has been published (or last modified, more on that below), and a basic search algorithm. This project uses the [Amber](https://amberframework.org) web framework with a Crystal backend and a frontend in JavaScript. The focus is on the backend, so not too much work was put into making things look good at the front beyond what Amber ships with plus some very minor stylings for better readability in some places. For faster results with continuous use a redis cache is employed, caching both the full content of the sites requested as well the extracted article date, if that algorithm has already run. For easy comparisons between performance with cached vs un-cached sites the site includes a "Clear Cache" button which fully clears the redis database. This obviously clears the cache for every client and something like it would obviously not be included in an actually production-ready version of something like this. Also not implemented is that the cache expires at some point, which is also something that should probably happen for a production-ready build.
 
-A demo of this project in action can be enjoyed at http://demo.pedestrian-programming.com
-Do note that at this time the demo is not being served via https.
+~~A demo of this project in action can be enjoyed at http://demo.pedestrian-programming.com
+Do note that at this time the demo is not being served via https.~~ Unfortunately, the live version of this application is currently broken. I will try to get it back online as fast as possible.
 
 ### Date Extration
 
